@@ -1,0 +1,92 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace dotnetapp.Models
+{
+    public class Product
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public string Description { get; set; }
+    }
+}
+
+------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using dotnetapp.Models;
+namespace dotnetapp.Services
+{
+    public class ProductService
+    {
+        private List<Product> products = new List<Product>(){
+            new Product(){Id = 1,Name = "Product 1",Price = 10.99m,Description = "Description 1"},
+            new Product(){Id = 2,Name = "Product 2",Price = 20.49m,Description = "Description 2"},
+            new Product(){Id = 3,Name = "Product 3",Price = 15.99m,Description = "Description 3"}
+        };
+
+        public List<Product> GetProducts(){
+            return products;
+        }
+
+        public Product GetSingleProduct(int id){
+            var currProduct = products.Find(i => i.Id == id);
+            return currProduct;
+
+        }
+
+        public void Create(Product product){
+            products.Add(product);
+        }
+    }
+}
+
+
+------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+// using dotnetapp.Models;
+using Microsoft.AspNetCore.Mvc;
+using dotnetapp.Services;
+using dotnetapp.Models;
+namespace dotnetapp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProductController : ControllerBase
+    {
+       static  ProductService ps = new ProductService();
+
+        [HttpGet]
+        public IActionResult GetAllProducts(){
+            return Ok(ps.GetProducts());
+        }
+         
+        [HttpGet("{productId}")]
+        public IActionResult GetProductById(int productId){
+            var product = ps.GetSingleProduct(productId);
+            if( product != null){
+                return Ok(product);
+            } else {
+                return NotFound();
+            }
+           
+        }
+         
+        [HttpPost]
+        public IActionResult AddProduct(Product newProduct){
+            ps.Create(newProduct);
+            return Ok("Done");
+        }
+
+    }
+}
