@@ -1,0 +1,131 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace dotnetapp.Models
+{
+    public class Event
+    {
+        public int EventId { get; set; }
+        public string Name { get; set; }
+        public DateTime Date { get; set; }
+        public string Location { get; set; }
+    }
+}
+
+-----------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using dotnetapp.Models;
+
+namespace dotnetapp.Controllers
+{
+    public class EventService
+    {
+        private static List<Event> events = new List<Event>(){
+            new Event(){EventId = 1,Name = "Event 1",Date = DateTime.Now.AddDays(7),Location = "Location 1"},
+            new Event(){EventId = 2,Name = "Event 2",Date = DateTime.Now.AddDays(14),Location = "Location 2"},
+            new Event(){EventId = 3,Name = "Event 3",Date = DateTime.Now.AddDays(21),Location = "Location 3"}
+        };
+
+        public List<Event> Read(){
+            return events;
+        }
+
+        public Event ReadById(int eventId){
+            var currEvent = events.Find(i => i.EventId == eventId);
+            return currEvent;
+        }
+
+        public void Create(Event model){
+            events.Add(model);
+        }
+
+        public Event Update(int eventId,Event updatedEvent){
+            var currEvent = events.Find(i => i.EventId == eventId);
+            if(currEvent != null){
+                currEvent.Name = updatedEvent.Name;
+                currEvent.Date = updatedEvent.Date;
+                currEvent.Location = updatedEvent.Location;
+                return currEvent;
+            }else{
+                return currEvent;
+            }
+        }
+
+        public Event Delete(int eventId){
+            var currEvent = events.Find(i => i.EventId == eventId);
+            if(currEvent != null){
+                events.Remove(currEvent);
+                return currEvent;
+            }else{
+                return currEvent;
+            }
+        }
+    }
+}
+
+-----------------------------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using dotnetapp.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace dotnetapp.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EventController : ControllerBase
+    {
+        EventService es = new EventService();
+
+        [HttpGet]
+        public IActionResult GetAllEvents(){
+            return Ok(es.Read());
+        }
+
+        [HttpGet("{eventId}")]
+        public IActionResult GetEventById(int eventId){
+            var currEvent = es.ReadById(eventId);
+            if(currEvent == null){
+                return NotFound();
+            }
+            return Ok(currEvent);
+        }
+
+        [HttpPost]
+        public IActionResult CreateEvent(Event newEvent){
+            es.Create(newEvent);
+            return Ok("Added successfully");
+        }
+        
+
+        [HttpPut("{eventId}")]
+        public IActionResult UpdateEvent(int eventId,Event updatedEvent){
+            var currEvent = es.Update(eventId,updatedEvent);
+            if(currEvent == null){
+                return NotFound();
+            }
+            return  NoContent();
+        }
+        
+        [HttpDelete("{eventId}")]
+        public IActionResult DeleteEvent(int eventId){
+            var currEvent = es.Delete(eventId);
+            if(currEvent == null){
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+        
+    }
+}
+
