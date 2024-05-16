@@ -103,9 +103,8 @@ namespace dotnetapp.Controllers
         [HttpPost]
         public IActionResult CreateEvent(Event newEvent){
             es.Create(newEvent);
-            return Ok("Added successfully");
-        }
-        
+            return CreatedAtAction("CreateEvent",newEvent);
+        }        
 
         [HttpPut("{eventId}")]
         public IActionResult UpdateEvent(int eventId,Event updatedEvent){
